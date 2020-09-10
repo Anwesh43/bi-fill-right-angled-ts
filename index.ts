@@ -1,6 +1,6 @@
 const w : number = window.innerWidth 
 const h : number = window.innerHeight
-const parts : number = 5  
+const parts : number = 6 
 const scGap : number = 0.02 / parts 
 const strokeFactor : number = 90 
 const sizeFactor : number = 4.6 
@@ -21,5 +21,54 @@ class ScaleUtil {
 
     static sinify(scale : number) : number {
         return Math.sin(scale * Math.PI)
+    }
+}
+
+class DrawingUtil {
+
+    static drawLine(context : CanvasRenderingContext2D, x1 : number, y1 : number, x2 : number, y2 : number) {
+        context.beginPath()
+        context.moveTo(x1, y1)
+        context.lineTo(x2, y2)
+        context.stroke()
+    }
+
+    static drawPath(context : CanvasRenderingContext2D, size : number, scale : number) {
+        context.beginPath()
+        context.moveTo(0, 0)
+        context.lineTo(0, -size * scale)
+        context.lineTo(-size * scale, -size * scale)
+        context.moveTo(0, 0)
+        context.fill()
+    }
+    
+    static drawBiFillRightAngle(context : CanvasRenderingContext2D, scale : number) {
+        const size : number = Math.min(w, h) / sizeFactor 
+        const sf : number = ScaleUtil.sinify(scale)
+        const sf1 : number = ScaleUtil.divideScale(sf, 0, parts)
+        const sf2 : number = ScaleUtil.divideScale(sf, 1, parts)
+        const sf3 : number = ScaleUtil.divideScale(sf, 2, parts)
+        const sf4 : number = ScaleUtil.divideScale(sf, 3, parts)
+        const sf5 : number = ScaleUtil.divideScale(sf, 4, parts)
+        context.save()
+        context.translate(w / 2, h / 2)
+        for (var j = 0; j < 2; j++) {
+            context.save()
+            context.scale(1 - 2 * j, 1)
+            DrawingUtil.drawLine(context, 0, 0, 0, -size * sf1)
+            DrawingUtil.drawLine(context, 0, -size * sf1, -size * sf2, -size * sf1)
+            DrawingUtil.drawLine(context, -size * sf2, -size * sf1, -size * sf2 + size * sf3, -size * sf1 + size * sf4)
+            DrawingUtil.drawPath(context, size, sf4)
+            context.restore()
+        }
+        context.restore()
+    }
+
+    static drawBFRANode(context : CanvasRenderingContext2D, i : number, scale : number) {
+        context.lineCap = 'round'
+        context.lineWidth = Math.min(w, h) / strokeFactor 
+        context.strokeStyle = colors[i]
+        context.fillStyle = colors[i]
+        DrawingUtil.drawBiFillRightAngle(context, scale)
     }
 }
