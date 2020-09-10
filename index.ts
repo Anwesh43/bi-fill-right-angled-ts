@@ -16,7 +16,7 @@ class ScaleUtil {
     }
 
     static divideScale(scale : number, i : number, n : number) : number {
-        return Math.min(1 / n, ScaleUtil.divideScale(scale, i, n)) * n 
+        return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n 
     }
 
     static sinify(scale : number) : number {
@@ -38,7 +38,7 @@ class DrawingUtil {
         context.moveTo(0, 0)
         context.lineTo(0, -size * scale)
         context.lineTo(-size * scale, -size * scale)
-        context.moveTo(0, 0)
+        context.lineTo(0, 0)
         context.fill()
     }
     
@@ -52,12 +52,13 @@ class DrawingUtil {
         const sf5 : number = ScaleUtil.divideScale(sf, 4, parts)
         context.save()
         context.translate(w / 2, h / 2)
+        context.rotate(rot * sf5)
         for (var j = 0; j < 2; j++) {
             context.save()
-            context.scale(1 - 2 * j, 1)
+            context.scale(1 - 2 * j, 1 - 2 * j)
             DrawingUtil.drawLine(context, 0, 0, 0, -size * sf1)
             DrawingUtil.drawLine(context, 0, -size * sf1, -size * sf2, -size * sf1)
-            DrawingUtil.drawLine(context, -size * sf2, -size * sf1, -size * sf2 + size * sf3, -size * sf1 + size * sf4)
+            DrawingUtil.drawLine(context, -size * sf2, -size * sf1, -size * sf2 + size * sf3, -size * sf1 + size * sf3)
             DrawingUtil.drawPath(context, size, sf4)
             context.restore()
         }
@@ -229,6 +230,7 @@ class Renderer {
     handleTap(cb : Function) {
         this.bfra.startUpdating(() => {
             this.animator.start(() => {
+                cb()
                 this.bfra.update(() => {
                     this.animator.stop()
                     cb()
