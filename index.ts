@@ -212,3 +212,24 @@ class BiFillRightAngle {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+
+    bfra : BiFillRightAngle = new BiFillRightAngle()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.bfra.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.bfra.startUpdating(() => {
+            this.animator.start(() => {
+                this.bfra.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
